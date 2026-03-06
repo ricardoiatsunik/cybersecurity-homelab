@@ -202,28 +202,23 @@ sudo tail -f /var/ossec/logs/ossec.log
 
 No papel de um analista SOC, é importante reconhecer os sinais de cada tipo de scan:
 
-SYN scan (-sS) Conexões incompletas, muitos SYN_RECV
-
-Scan de versão (-sV) Conexões estabelecidas com banners
-
-Scan agressivo (-A) Múltiplas conexões, scripts rodando, padrões anômalos
-
-Scripts NSE  Requisições HTTP estranhas, consultas SMB, etc.
-
+- SYN scan (-sS) Conexões incompletas, muitos SYN_RECV
+- Scan de versão (-sV) Conexões estabelecidas com banners
+- Scan agressivo (-A) Múltiplas conexões, scripts rodando, padrões anômalos
+- Scripts NSE  Requisições HTTP estranhas, consultas SMB, etc.
 
 ```bash
 nmap -sV -p1-1000 192.168.12.100
 ```
 <img width="738" height="181" alt="image" src="https://github.com/user-attachments/assets/390741d4-ee85-46c6-9c9b-66ac3c001c43" />
 
-Scan de versão (-sV) – O que foi usado:
+- Scan de versão (-sV) – O que foi usado:
 
-Estabelece conexão completa com o serviço
+* Estabelece conexão completa com o serviço
+* Envia probes para extrair banner (versão)
 
-Envia probes para extrair banner (versão)
 
-
-Perspectiva defensiva (Logs):
+- Perspectiva defensiva (Logs):
 
         Apache: access.log com GET / ou HEAD /
 
