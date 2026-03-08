@@ -53,13 +53,10 @@ O ambiente integra:
 - Packer 1.15+
 - Git
 
-### Ferramentas
+### Ferramentas de Segurança
 - Nmap
 - Hydra
 - Metasploit
-- Nikto
-- Gobuster
-- Burp Suite
 
 ---
 
@@ -143,7 +140,7 @@ sudo ufw --force enable
 
 ---
 
-### Deploy do Metasploitable 3
+### Deploy Metasploitable 3
 
 ```powershell
 vagrant plugin install vagrant-vmware-desktop
@@ -158,7 +155,7 @@ vagrant up --provider=vmware_desktop
 
 ---
 
-### Configuração de IP Estático (Linux)
+### Configuração de IP Estático
 
 ```bash
 sudo ip addr add 192.168.12.100/24 dev eth1
@@ -231,7 +228,7 @@ Envia probes para extrair banner (versão)
 
 ---
 
-## Teste de Autenticação com Hydra (Brute-force SSH)
+## Exemplo de um ataque Força Bruta SSH:
 
 <img width="844" height="251" alt="image" src="https://github.com/user-attachments/assets/e6c5f533-13ac-4b23-8066-f94dbfafbc82" />
 
