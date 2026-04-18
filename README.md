@@ -1,126 +1,116 @@
-# 🛡 Cybersecurity Home Lab --- Wazuh + Metasploitable 3
+<p align="center">
+<a href="README.en-US.md">🌐English version</a>
+</p>
 
-Laboratório completo e documentado para prática de segurança ofensiva,
-detecção, engenharia de detecção, monitoramento SOC e análise de
-eventos.
+## Homelab de Cibersegurança com Wazuh e Metasploitable 3
 
-Este repositório consolida **infraestrutura, metodologia ofensiva,
-telemetria e detecção**, formando um ambiente realista para simulação do
-ciclo completo de ataque e resposta.
+Documentação do desenvolvimento e uso de um ambiente controlado voltado ao estudo prático ofensivo e monitoramento defensivo.
 
-------------------------------------------------------------------------
+O ambiente integra:
 
-# 📌 Visão Geral
+- Wazuh como plataforma SIEM
+- VM Metasploitable 3 como alvo vulnerável
+- Ferramentas executadas via WSL2
+- VMware Workstation Pro
+  
+---
 
-O ambiente foi construído para simular um fluxo real de operação:
+## Objetivos do Projeto
 
-Reconhecimento → Enumeração → Ataque → Exploração → Pós-exploração →
-Geração de logs → Detecção → Análise → Criação de regra → Resposta
+- Praticar técnicas de pentest em ambiente isolado
+- Entender a geração de logs em diferentes serviços
+- Analisar como um SIEM correlaciona eventos
+- Criar regras customizadas de detecção
+- Simular perspectiva de SOC
+- Elaborar documentação técnica
 
-O foco atual do laboratório está na máquina **Linux (Metasploitable 3 -
-ub1404)**.\
-A VM Windows (win2k8) será integrada futuramente, mas ainda não faz
-parte dos cenários ativos.
+---
 
-------------------------------------------------------------------------
+<details>
+<summary><h2><b>Clique aqui para ver a arquitetura do projeto</b></h2></summary>
 
-# 🎯 Objetivos do Projeto
+• Host: Windows  
+• WSL2 - ambiente ofensivo
 
--   Praticar técnicas de pentest em ambiente isolado
--   Entender geração de logs em sistemas vulneráveis
--   Analisar como um SIEM correlaciona eventos
--   Criar regras customizadas no Wazuh
--   Simular rotina de SOC (Tier 1)
--   Documentar tecnicamente cada fase do ataque
--   Desenvolver visão ofensiva e defensiva integrada
+• VMware Workstation Pro
 
-------------------------------------------------------------------------
+• Wazuh Server (Ubuntu 24.04)  
+• NAT
 
-# 🏗 Arquitetura do Ambiente
+• Host-only - rede interna isolada  
+• Metasploitable 3 (ub1404) – alvo
 
-Host: Windows 10
+**Rede interna isolada:** `192.168.12.0/24`
 
--   WSL2 (ambiente ofensivo)
--   VMware Workstation Pro
-    -   Wazuh Server (Ubuntu 24.04)
-        -   NAT (internet para instalação e updates)
-        -   Host-only (rede interna isolada)
-    -   Metasploitable 3
-        -   ub1404 (Linux vulnerável)
+---
 
-Rede interna isolada: 192.168.X.0/24
+## Componentes
 
-------------------------------------------------------------------------
+### Wazuh
+- Indexer
+- Manager
+- Dashboard
 
-# 🧱 Componentes
+### Máquina Vulnerável
+- Metasploitable 3 (ub1404)
 
-## 🔹 Wazuh
+### Infraestrutura
+- VMware Workstation Pro 17+
+- Vagrant 2.4+
+- Packer 1.15+
+- Git
 
--   Indexer
--   Server
--   Dashboard
+### Ferramentas de Segurança
+- Nmap
+- Hydra
+- Metasploit
 
-## 🔹 Máquina Vulnerável
+---
 
--   Metasploitable 3 (ub1404)
+## Requisitos Técnicos
 
-## 🔹 Infraestrutura
+**Hardware recomendado:**  
+- 16 GB RAM  
+- 4+ núcleos de CPU  
+- SSD
+</details>
 
--   VMware Workstation Pro 17+
--   Vagrant 2.4+
--   Packer 1.15+
--   Git
+##
 
-## 🔹 Ferramentas Ofensivas
+## Deploy do Ambiente
 
--   Nmap
--   Hydra
--   Metasploit
--   Nikto
--   Gobuster
--   Burp Suite
+### Configuração de Rede no VMware
 
-------------------------------------------------------------------------
+No **Virtual Network Editor**:
 
-# 💻 Requisitos Técnicos
+- **VMnet1** → Host-only → DHCP habilitado  
+- **VMnet8** → NAT → DHCP habilitado
 
-Hardware recomendado: - 16GB RAM - 4+ cores - SSD
+---
 
-------------------------------------------------------------------------
-
-# 🚀 Deploy Completo do Ambiente
-
-## 1️⃣ Configuração de Rede no VMware
-
-Virtual Network Editor:
-
--   VMnet1 → Host-only → DHCP habilitado
--   VMnet8 → NAT → DHCP habilitado
-
-------------------------------------------------------------------------
-
-## 2️⃣ Instalação do Wazuh (Ubuntu 24.04)
+### Instalação do Wazuh (Ubuntu 24.04)
 
 Criar VM com:
 
--   6GB RAM
--   2 CPUs
--   30GB Disco
--   NAT + Host-only
+- 6 GB RAM
+- 2 CPUs
+- 30 GB de disco
+- Adaptador 1: NAT
+- Adaptador 2: Host-only (VMnet1)
 
-### Download do instalador
+#### Download do instalador
 
-``` bash
+```bash
 curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh
 curl -sO https://packages.wazuh.com/4.14/config.yml
 sudo bash wazuh-install.sh --generate-config-files
 ```
 
-### Configuração do cluster (single-node)
+#### Configuração do cluster (single-node)
 
 Editar `config.yml`:
 
-``` yaml
+```yaml
 nodes:
   indexer:
     - name: node-1
@@ -133,18 +123,18 @@ nodes:
       ip: "192.168.12.128"
 ```
 
-### Instalação dos componentes
+#### Instalação dos componentes
 
-``` bash
+```bash
 sudo bash wazuh-install.sh --wazuh-indexer node-1
 sudo bash wazuh-install.sh --start-cluster
 sudo bash wazuh-install.sh --wazuh-server wazuh-1
 sudo bash wazuh-install.sh --wazuh-dashboard dashboard
 ```
 
-### Configuração de Firewall
+#### Configuração de Firewall
 
-``` bash
+```bash
 sudo ufw allow 1514/tcp
 sudo ufw allow 1514/udp
 sudo ufw allow 1515/tcp
@@ -156,35 +146,35 @@ sudo ufw allow 5601/tcp
 sudo ufw --force enable
 ```
 
-------------------------------------------------------------------------
+---
 
-## 3️⃣ Deploy do Metasploitable 3
+### Deploy Metasploitable 3
 
-``` powershell
+```powershell
 vagrant plugin install vagrant-vmware-desktop
 ```
 
-``` powershell
+```powershell
 mkdir C:\Metasploitable3-Workspace
 cd C:\Metasploitable3-Workspace
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/rapid7/metasploitable3/master/Vagrantfile" -OutFile "Vagrantfile"
 vagrant up --provider=vmware_desktop
 ```
 
-------------------------------------------------------------------------
+---
 
-## 4️⃣ Configuração de IP Estático (Linux)
+### Configuração de IP Estático
 
-``` bash
-sudo ip addr add 192.168.12.130/24 dev eth1
+```bash
+sudo ip addr add 192.168.12.100/24 dev eth1
 sudo ip link set eth1 up
 ```
 
-------------------------------------------------------------------------
+---
 
-## 5️⃣ Instalação do Agente Wazuh
+### Instalação do Agente Wazuh
 
-``` bash
+```bash
 curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | sudo apt-key add -
 echo "deb https://packages.wazuh.com/4.14/apt/ stable main" | sudo tee /etc/apt/sources.list.d/wazuh.list
 sudo apt-get update
@@ -194,75 +184,76 @@ sudo service wazuh-agent start
 
 Verificação:
 
-``` bash
+```bash
 sudo tail -f /var/ossec/logs/ossec.log
 ```
 
-------------------------------------------------------------------------
+---
 
-# 🔎 Metodologia Operacional
+## Metodologia
 
-1.  Reconhecimento de superfície
-2.  Enumeração de serviços
-3.  Ataques de autenticação
-4.  Exploração remota
-5.  Pós-exploração
-6.  Análise de logs
-7.  Criação de regras de detecção
-8.  Documentação técnica
+1. Reconhecimento de superfície  
+2. Enumeração de serviços  
+3. Ataques de autenticação  
+4. Exploração remota  
+5. Pós-exploração  
+6. Análise de logs  
+7. Criação de regras de detecção  
+8. Documentação técnica
 
-------------------------------------------------------------------------
+---
 
-# 🛰 Enumeração (Nmap)
+## Enumeração com Nmap
 
-``` bash
-nmap -sS -sV -p445 --script smb-enum-shares,smb-os-discovery <ip_alvo>
-nmap -sV -p21 --script ftp-anon,ftp-vsftpd-backdoor <ip_alvo>
-nmap -sV -p22 --script ssh-auth-methods <ip_alvo>
-nmap -sV -p80 --script http-enum,http-methods,http-title <ip_alvo>
+No papel de um analista SOC, é importante reconhecer os sinais de cada tipo de scan:
+
+- SYN scan (-sS) Conexões incompletas, muitos SYN_RECV
+- Scan de versão (-sV) Conexões estabelecidas com banners
+- Scan agressivo (-A) Múltiplas conexões, scripts rodando, padrões anômalos
+- Scripts NSE  Requisições HTTP estranhas, consultas SMB, etc.
+
+```bash
+nmap -sV -p1-1000 192.168.12.100
+```
+<img width="738" height="181" alt="image" src="https://github.com/user-attachments/assets/390741d4-ee85-46c6-9c9b-66ac3c001c43" />
+
+- Scan de versão (-sV) – O que foi usado:
+
+Estabelece conexão completa com o serviço
+
+Envia probes para extrair banner (versão)
+
+##
+
+- Perspectiva defensiva (Logs):
+
+        Apache: access.log com GET / ou HEAD /
+
+        SSH: tentativas de conexão sem autenticação
+
+        FTP: comandos STAT, SYST
+
+
+---
+
+## Exemplo de Força Bruta SSH:
+
+<img width="844" height="251" alt="image" src="https://github.com/user-attachments/assets/e6c5f533-13ac-4b23-8066-f94dbfafbc82" />
+
+## Perspectiva defensiva nos logs do servidor:
+<img width="810" height="154" alt="image" src="https://github.com/user-attachments/assets/61a22ba5-73d9-4ac9-933b-0ce3cdf96019" />
+
+## Detecção com Wazuh
+
+Arquivo de regras customizadas:
+
+```
+/var/ossec/etc/rules/local_rules.xml
 ```
 
-------------------------------------------------------------------------
+Exemplo de regra para força bruta SSH:
 
-# 🔐 Ataques de Autenticação (Hydra)
-
-``` bash
-hydra -l msfadmin -P rockyou.txt ssh://<ip_alvo>
-hydra -l anonymous -P rockyou.txt ftp://<ip_alvo>
-hydra -l postgres -P rockyou.txt <ip_alvo> postgres
-```
-
-------------------------------------------------------------------------
-
-# 💣 Exploração Remota (Metasploit)
-
-``` bash
-search samba
-exploit/unix/misc/distcc_exec
-exploit/multi/http/tomcat_mgr_upload
-auxiliary/scanner/postgres/postgres_login
-```
-
-------------------------------------------------------------------------
-
-# 🌐 Descoberta de Vulnerabilidades Web
-
-``` bash
-nikto -h http://<ip_alvo>
-gobuster dir -u http://<ip_alvo> -w wordlist.txt
-```
-
-------------------------------------------------------------------------
-
-# 🧠 Engenharia de Detecção (Wazuh)
-
-Arquivo:
-
-    /var/ossec/etc/rules/local_rules.xml
-
-Exemplo de regra customizada:
-
-``` xml
+```xml
 <group name="custom,bruteforce">
   <rule id="100100" level="10">
     <if_sid>5716</if_sid>
@@ -271,28 +262,29 @@ Exemplo de regra customizada:
 </group>
 ```
 
-Aplicar:
+Aplicar regra:
 
-``` bash
+```bash
 sudo systemctl restart wazuh-manager
 ```
 
-------------------------------------------------------------------------
+---
 
-# 📊 Evolução Planejada (Roadmap)
+⚠️ Projeto pausado no momento.
 
--   Integração da VM Windows (win2k8)
--   Simulação de movimentação lateral
--   Implementação de alertas baseados em MITRE ATT&CK
--   Dashboards personalizados
--   Simulação de resposta a incidente documentada
--   Criação de playbooks SOC
+## Metas
 
-------------------------------------------------------------------------
+- Integração da VM Windows (win2k8)
+- Implementação de alertas baseados em MITRE ATT&CK
+- Simulação de resposta a incidente
+- Criação de playbooks SOC
 
-# ⚖ Aviso Ético
+---
 
-Todos os testes são realizados exclusivamente em ambiente isolado para
-fins educacionais. Nenhum sistema externo é alvo de testes.
+## Referências
 
-------------------------------------------------------------------------
+- [🔗 Wazuh](https://documentation.wazuh.com)
+- [🔗 Metasploitable3](https://github.com/rapid7/metasploitable3/)
+- [🔗 Nmap](https://nmap.org/docs.html)
+- [🔗 Hydra](https://www.kali.org/tools/hydra/)
+- [🔗 Metasploit](https://docs.metasploit.com/)
