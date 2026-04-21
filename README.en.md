@@ -233,7 +233,13 @@ Sends probes to extract banner (version)
 
 ## Example of SSH Brute Force:
 
-## Detection with Wazuh
+<img width="844" height="251" alt="image" src="https://github.com/user-attachments/assets/3736919f-6bd3-4623-8436-9d06b457dd50" />
+
+
+## Server logs perspective:
+
+<img width="810" height="154" alt="image" src="https://github.com/user-attachments/assets/e06be0c3-1dae-444f-9297-66d7686bc212" />
+
 
 Custom rules file:
 
